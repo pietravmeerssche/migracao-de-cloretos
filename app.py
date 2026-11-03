@@ -25,27 +25,36 @@ FEATURES = [
 TARGET = "dnssm"
 
 NOMES = {
-    "wb": "Relação água/ligante (wb)",
-    "idade": "Idade",
-    "cimento": "Cimento",
-    "silica": "Sílica",
-    "cinza": "Cinza",
-    "escoria": "Escória",
-    "calcario": "Calcário",
-    "metacaulim": "Metacaulim",
-    "agregado": "Agregado",
-    "sio2": "SiO₂",
-    "al2O3": "Al₂O₃",
-    "fe2O3": "Fe₂O₃",
-    "cao": "CaO",
-    "mgo": "MgO",
+    "wb": "Relação água/aglomerante",
+    "idade": "Idade do ensaio em dias",
+    "cimento": "Consumo de cimento em kg/m³",
+    "silica": "Consumo de sílica em kg/m³",
+    "cinza": "Consumo de cinza volante em kg/m³",
+    "escoria": "Consumo de escória em kg/m³",
+    "calcario": "Consumo de calcário em kg/m³",
+    "metacaulim": "Consumo de metacaulim em kg/m³",
+    "agregado": "Consumo total de agregados em kg/m³",
+    "sio2": "Óxido de silício em %",
+    "al2O3": "Óxido de alumínio em %",
+    "fe2O3": "Óxido férrico em %",
+    "cao": "Óxido de cálcio em %",
+    "mgo": "Óxido de magnésio em %",
 }
+
+# Ordem de apresentação solicitada pelo usuário. A ordem interna FEATURES
+# permanece inalterada para preservar a correspondência com o treinamento.
+ORDEM_INTERFACE = [
+    "wb", "cimento", "cinza", "calcario", "agregado", "idade",
+    "silica", "escoria", "metacaulim", "sio2", "fe2O3", "mgo",
+    "al2O3", "cao",
+]
 
 st.title("🧪 Previsão da migração de cloretos")
 st.caption("Modelo de regressão XGBoost baseado na planilha e no notebook deste projeto.")
 st.write(
-    "Informe as características da mistura e do ensaio para estimar o valor de **DNSSM**. "
-    "Os campos são apresentados na mesma ordem das variáveis utilizadas no treinamento."
+    "Informe as características da mistura e do ensaio para estimar o coeficiente "
+    "de migração de cloretos no estado não estacionário. "
+    "A unidade do resultado é apresentada em × 10⁻¹² m²/s."
 )
 
 
@@ -145,7 +154,7 @@ with st.form("formulario_dnssm"):
     valores = {}
     colunas = st.columns(2)
 
-    for i, feature in enumerate(FEATURES):
+    for i, feature in enumerate(ORDEM_INTERFACE):
         stats = estatisticas[feature]
         minimo = stats["min"]
         maximo = stats["max"]
@@ -171,7 +180,7 @@ with st.form("formulario_dnssm"):
         )
 
     enviar = st.form_submit_button(
-        "Estimar DNSSM",
+        "Estimar o coeficiente de migração de cloretos no estado não estacionário (× 10⁻¹² m²/s)",
         type="primary",
         use_container_width=True,
     )
@@ -182,10 +191,14 @@ if enviar:
         previsao = float(modelo.predict(entrada)[0])
 
         st.success("Previsão calculada com sucesso.")
-        st.metric("DNSSM estimado", f"{previsao:.6g}")
+        st.metric(
+            "Coeficiente de migração de cloretos no estado não estacionário",
+            f"{previsao:.6g} × 10⁻¹² m²/s",
+        )
+        st.caption("Unidade apresentada conforme especificação da interface: × 10⁻¹² m²/s.")
 
         st.write("**Valores enviados ao modelo**")
-        for feature in FEATURES:
+        for feature in ORDEM_INTERFACE:
             st.write(f"- **{NOMES.get(feature, feature)}:** {valores[feature]:.4f}")
 
         fora_faixa = [
