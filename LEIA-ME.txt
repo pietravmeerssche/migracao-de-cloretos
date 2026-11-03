@@ -1,0 +1,12 @@
+DEPLOY - MIGRAÇÃO DE CLORETOS (INTERFACE ATUALIZADA)
+
+Arquivos incluídos:
+- app.py: interface Streamlit com os rótulos solicitados e o botão de previsão atualizado.
+- requirements.txt: dependências da aplicação.
+
+Mantenha databaseteste1.xlsx na raiz do repositório, no mesmo nível de app.py e requirements.txt.
+O app lê a planilha, reproduz a divisão treino/teste do projeto e treina o XGBoost ao iniciar.
+Não é necessário modelo.pkl, pois o script original não salva esse artefato.
+
+A ordem interna das variáveis usadas pelo modelo foi preservada. A ordem dos campos exibidos na interface segue a lista solicitada.
+O resultado é apresentado com a unidade informada pelo usuário: × 10⁻¹² m²/s.
